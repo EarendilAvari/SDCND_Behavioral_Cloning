@@ -1,3 +1,8 @@
 # Ignore simulator data folder
 Simulator/
+TrainingData1/
+VideosReport/
+
+model.h5
+model2.h5
 
