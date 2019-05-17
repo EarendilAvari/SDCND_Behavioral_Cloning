@@ -35,6 +35,5 @@ This model was trained using the Adam optimizer also used on the traffic sign cl
 
 By using the trained model to drive the car in autonomous mode, it dit really good for the first try, with few data and no data augmentation. It could not make the entire lap though, The car went out of the street on a curve with mud over the street line.  This can be seen in the following video.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/8-T4qriTvCE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
+[![Autonomous car, try 1](https://i.imgur.com/aR3TV6A.png)](https://www.youtube.com/watch?v=8-T4qriTvCE "Autonomous car, try 1")
 
