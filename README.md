@@ -16,6 +16,8 @@ In order to collect the data needed to train the network, the Udacity's car simu
 
 ### First model 
 
+#### Training with images of only one camera
+
 As a starting point, the model used for the traffic sign classifier was selected, since it has shown a very high performance detecting street signs. This model was modified to the new problem like this:
 
 - Normalization layer for input from range 0-255 to 0-1
@@ -36,4 +38,30 @@ This model was trained using the Adam optimizer also used on the traffic sign cl
 By using the trained model to drive the car in autonomous mode, it dit really good for the first try, with few data and no data augmentation. It could not make the entire lap though, The car went out of the street on a curve with mud over the street line.  This can be seen in the following video.
 
 [![Autonomous car, try 1](https://i.imgur.com/aR3TV6A.png)](https://www.youtube.com/watch?v=8-T4qriTvCE "Autonomous car, try 1")
+
+#### Training with images of the three cameras
+
+The low loss of the last trained model can indicate that the model was actually overfitting the data. This is logic since the amount of data used for this training was very little (only 3859 images, since only the image of the front mirror camera was used).
+
+The next step in order to improve the performance of the model would be to use the three images
+
+In order to use the lateral images an offset of 15° for the angle measurements corresponding to the left camera is used and an offset of -15° for the angle measurements corresponding to the right camera is used. 
+
+Using these images not only increases the amount of data from 3859 to 11577, it also helps the car to learn how to come back to the street after going out from it.
+
+Using these images actually increased the performance of the model a bit, but at the end the car also went out of the road.
+
+[![Autonomous car, try 2](https://i.imgur.com/S7PBb26.jpg)](https://www.youtube.com/watch?v=8Heo4AqVRbc "Autonomous car, try 2")
+
+Analysing the training and validation loss, it can be seen that the training loss is lower than 0.0025 after training, but the validation loss is like 0.010 which is 4 times higher than the training loss. This indicates that the model is still overfitting, so data augmentation is needed here.
+
+![ Image1](./ImgsReport/01_TrainingLossBatches3Cams.png  "TrainingData3Cameras")
+ 
+
+ 
+
+
+
+
+
 

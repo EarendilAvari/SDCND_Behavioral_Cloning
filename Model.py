@@ -24,16 +24,22 @@ trainingImgs = []
 trainingMeasurements = []
 
 for line in csvLines:
-    imgPath = line[0]
-    imgName = imgPath.split('/')[-1]
-    currPath = 'TrainingData1/IMG/' + imgName
-    trainingImgBGR = cv2.imread(currPath)
-    trainingImgRGB = cv2.cvtColor(trainingImgBGR, cv2.COLOR_BGR2RGB)
-    trainingImgs.append(trainingImgRGB)
-    
-    trainingMeasurement = float(line[3])
-    trainingMeasurements.append(trainingMeasurement)
-    
+    correctionFactor = 25*(np.pi/180)
+    for i in range(3):
+        imgPath = line[i]
+        imgName = imgPath.split('/')[-1]
+        currPath = 'TrainingData1/IMG/' + imgName
+        trainingImgBGR = cv2.imread(currPath)
+        trainingImgRGB = cv2.cvtColor(trainingImgBGR, cv2.COLOR_BGR2RGB)
+        trainingImgs.append(trainingImgRGB)
+        if i == 0:
+            trainingMeasurement = float(line[3])
+        elif i == 1:
+            trainingMeasurement = float(line[3]) + correctionFactor
+        elif i == 2:
+            trainingMeasurement = float(line[3]) - correctionFactor
+        trainingMeasurements.append(trainingMeasurement)
+        
 X_train = np.array(trainingImgs)
 Y_train = np.array(trainingMeasurements)
 
@@ -42,6 +48,10 @@ Y_train = np.array(trainingMeasurements)
 #%% USING MODEL OF PROJECT 3 (TRAFFIC SIGN CLASSIFIER)
 # As first model alternative for this task, the improved LeNet network used on the last project is used. Here it is programmed
 # again using Keras
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+os.environ['QT_STYLE_OVERRIDE']='gtk2'
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten, Dropout, Lambda
@@ -87,14 +97,27 @@ model.summary()
 
 #%% TRAINING AND SAVING THE MODEL
 
+from keras.callbacks import Callback
+
+class LossHistory(Callback):
+    def on_train_begin(self, logs={}):
+        self.trainingLoss = []
+
+    def on_batch_end(self, batch, logs={}):
+        self.trainingLoss.append(logs.get('loss'))
+
 model.compile(loss = 'mse', optimizer = 'adam')
-model.fit(X_train, Y_train, validation_split=0.2, shuffle = True)
+datalogBatches = LossHistory()
+datalogEpochs = model.fit(X_train, Y_train, validation_split=0.2, shuffle = True, epochs = 20, callbacks = [datalogBatches])
 model.save('model.h5')
 
+#%%
 
-
-
-
+import pickle
+with open('modelDatalog.p', 'wb') as pickleFile:
+    pickle.dump(datalogBatches.trainingLoss, pickleFile)
+    pickle.dump(datalogEpochs.history['loss'], pickleFile)
+    pickle.dump(datalogEpochs.history['val_loss'], pickleFile)
 
 
 
