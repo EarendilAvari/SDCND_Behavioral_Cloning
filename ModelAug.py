@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Sat May 18 21:39:11 2019
+
+@author: earendilavari
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Fri May 17 01:48:25 2019
 
 @author: earendilavari
@@ -31,9 +39,9 @@ for line in csvLines:
         currPath = 'TrainingData1/IMG/' + imgName
         trainingImgBGR = cv2.imread(currPath)
         trainingImgRGB = cv2.cvtColor(trainingImgBGR, cv2.COLOR_BGR2RGB)
-        trainingFlippedImgRGB = cv2.flip(trainingImgRGB, 1)
+        #trainingFlippedImgRGB = cv2.flip(trainingImgRGB, 1)
         X_train.append(trainingImgRGB)
-        X_train.append(trainingFlippedImgRGB)
+        #X_train.append(trainingFlippedImgRGB)
         if i == 0:
             trainingMeasurement = float(line[3])
         elif i == 1:
@@ -41,7 +49,7 @@ for line in csvLines:
         elif i == 2:
             trainingMeasurement = float(line[3]) - correctionFactor
         Y_train.append(trainingMeasurement)
-        Y_train.append(-trainingMeasurement)
+        #Y_train.append(-trainingMeasurement)
 
         
 X_train = np.array(X_train)
@@ -99,9 +107,30 @@ model.add(Dense(1))
 
 model.summary()
 
-#%% TRAINING AND SAVING THE MODEL
+#%% PREPARATION OF THE DATA
 
-from keras.callbacks import Callback
+from keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
+
+## Shuffles train data 
+X_train, Y_train = shuffle(X_train, Y_train)
+
+## Splits train data into train and validation
+X_train, X_valid, Y_train, Y_valid = train_test_split(X_train, Y_train, test_size = 0.10, random_state = 347534)
+
+### Generator of augmented data (It is very important that horizontal flip and vertical flip are false!)
+datagen = ImageDataGenerator(
+    featurewise_center=True,
+    featurewise_std_normalization=True,
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=False, 
+    vertical_flip=False)
+
+#%% CALLBACKS FOR TRAINING  
+from keras.callbacks import Callback, ModelCheckpoint, EarlyStopping
 
 class LossHistory(Callback):
     def on_train_begin(self, logs={}):
@@ -109,10 +138,20 @@ class LossHistory(Callback):
 
     def on_batch_end(self, batch, logs={}):
         self.trainingLoss.append(logs.get('loss'))
+        
+## Callback to save the best model
+modelCheckpoint = ModelCheckpoint(filepath = 'modelBest.h5', monitor = 'val_loss', save_best_only = True)
+earlyStopper = EarlyStopping(monitor = 'val_loss', min_delta = 0.0003, patience = 5)
+
+#%% TRAINING OF THE MODEL
 
 model.compile(loss = 'mse', optimizer = 'adam')
 datalogBatches = LossHistory()
-datalogEpochs = model.fit(X_train, Y_train, validation_split=0.2, shuffle = True, epochs = 20, callbacks = [datalogBatches])
+datalogEpochs = model.fit_generator(datagen.flow(X_train, Y_train, batch_size=32), steps_per_epoch=len(X_train)/32,
+                                    epochs = 20, verbose = 1, validation_data = (X_valid, Y_valid), 
+                                    callbacks = [datalogBatches, modelCheckpoint, earlyStopper])
+
+#datalogEpochs = model.fit(X_train, Y_train, validation_split=0.2, shuffle = True, epochs = 20, callbacks = [datalogBatches])
 model.save('model.h5')
 
 #%%
@@ -122,25 +161,3 @@ with open('modelDatalog.p', 'wb') as pickleFile:
     pickle.dump(datalogBatches.trainingLoss, pickleFile)
     pickle.dump(datalogEpochs.history['loss'], pickleFile)
     pickle.dump(datalogEpochs.history['val_loss'], pickleFile)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 

@@ -56,6 +56,32 @@ Using these images actually increased the performance of the model a bit, but at
 Analysing the training and validation loss, it can be seen that the training loss is lower than 0.0025 after training, but the validation loss is like 0.010 which is 4 times higher than the training loss. This indicates that the model is still overfitting, so data augmentation is needed here.
 
 ![ Image1](./ImgsReport/01_TrainingLossBatches3Cams.png  "TrainingData3Cameras")
+
+### Data augmentation
+
+#### Fliping images horizontally
+
+In the standard training loop, the car is normally always going straight or to the left, this can result that the car does not learn how to stear to the right because of lacking training data. One way to fight this is to flip the training images horizontally and negate the angle measurement.
+
+By adding horizontally flipped images to the dataset, its size duplicated. And by training the network with this augmented dataset, the training and validation losses stayed almost the same. So this did not really help.
+
+![ Image2](./ImgsReport/02_TrainingLossBatchesFlippedImages.png  "TrainingDataFlippedImages")
+
+
+#### Using Keras' image data generator
+
+Other option is to use the built in Keras image data generator to create augmented data in training time. For this it is important to deactivate the options "horizontal flip" and "vertical flip" since that can result on bad commands for the neural network. In order to use this method, the function "fit_generator" needs to be used for training instead of "fit".
+
+By using the generator to train the model, it is still not able to drive a lap in the simulator like it can be seen on the next video.
+
+[![Autonomous car, try with augmented data](https://i.imgur.com/acV8zfl.jpg)](https://www.youtube.com/watch?v=HHQeYbk3iK0 "Autonomous car, try with augmented data")
+
+It can be seen though that the training loss increased a lot, staying higher than the validation accuracy which is calculated without data augmentation. This means that the model is not overfitting anymore. So augmenting the data using this way is a good approach.
+
+![ Image3](./ImgsReport/03_TrainingLossAugmentedImages.png  "TrainingDataAugmentedImages")
+
+Two things can still be improved. One is the model and the other one is the data. In the following section a new model is presented and trained with the same data collected until now. In the subsequent section, the new model is trained with new data.
+
  
 
  

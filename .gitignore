@@ -1,12 +1,10 @@
 # Ignore simulator data folder
 Simulator/
+# Ignore training data
 TrainingData1/
+# Ignore videos used on the report
 VideosReport/
+# Ignore data of old models
+OldModels/
 
-model.h5
-model2.h5
-model3.h5
-model4.h5
-modelDatalog.p
-modelDatalog4.p
 
