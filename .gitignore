@@ -2,9 +2,24 @@
 Simulator/
 # Ignore training data
 TrainingData1/
+TrainingData2/
+TrainingData3/
+TrainingDataNew/
+TrainingDataProcessed/
+DataUdacity/
+
 # Ignore videos used on the report
 VideosReport/
+
 # Ignore data of old models
 OldModels/
+ModelWorking/
 
+# Ignore compressed data
+OriginalData.tar.gz
+TrainingDataNew.tar.gz
+
+# Ignore models
+model.h5
+modelPretrained.h5
 
