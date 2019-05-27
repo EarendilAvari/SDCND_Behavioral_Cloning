@@ -18,6 +18,8 @@ with open('TrainingDataNewTrack/driving_log.csv') as csvfile:
 
 trainSamples, validationSamples = train_test_split(samples, test_size=0.2)
 
+#%% DEFINITION OF GENERATOR WHICH LOADS THE DATA IN TRAINING TIME
+
 def generator(samples, batch_size=32, angCorrection_factor = 0.2):
     num_samples = len(samples)
     while 1: # Loop forever so the generator never terminates
@@ -47,9 +49,7 @@ def generator(samples, batch_size=32, angCorrection_factor = 0.2):
 
 
 
-#%% USING MODEL OF PROJECT 3 (TRAFFIC SIGN CLASSIFIER)
-# As first model alternative for this task, the improved LeNet network used on the last project is used. Here it is programmed
-# again using Keras
+#%% DEFINITION OF THE MODEL
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
@@ -60,12 +60,12 @@ model = load_model('model.h5')
 
 model.summary()
 
-#%% CALLING THE GENERATORS
+#%% HYPERPARAMETERS
 
 BATCH_SIZE = 32
 EPOCHS = 30
 
-# compile and train the model using the generator function
+# Declares two generators, one for training and the other one for validation
 trainGenerator = generator(trainSamples, batch_size=BATCH_SIZE)
 validationGenerator = generator(validationSamples, batch_size=BATCH_SIZE)
 
@@ -79,7 +79,7 @@ class LossHistory(Callback):
     def on_batch_end(self, batch, logs={}):
         self.trainingLoss.append(logs.get('loss'))
         
-## Callback to save the best model
+## Callback to save the best model and to stop training if overfitting starts
 modelCheckpoint = ModelCheckpoint(filepath = 'model2TrackBest.h5', monitor = 'val_loss', save_best_only = True)
 earlyStopper = EarlyStopping(monitor = 'val_loss', min_delta = 0.0003, patience = 5)
 
@@ -92,10 +92,10 @@ datalogEpochs = model.fit_generator(trainGenerator, steps_per_epoch=np.ceil(len(
                                     validation_steps = np.ceil(len(validationSamples)/BATCH_SIZE), 
                                     callbacks = [datalogBatches, modelCheckpoint, earlyStopper])
 
-#datalogEpochs = model.fit(X_train, Y_train, validation_split=0.2, shuffle = True, epochs = 20, callbacks = [datalogBatches])
+
 model.save('model2Track.h5')
 
-#%%
+#%% SAVES DATA TO BE ANALYSED AFTERWARDS
 
 import pickle
 with open('model2TrackDatalog.p', 'wb') as pickleFile:
