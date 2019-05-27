@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 
 csvLines = []
-with open('TrainingData3/driving_log.csv') as csvFile:
+with open('TrainingData1/driving_log.csv') as csvFile:
     reader = csv.reader(csvFile)
     for line in reader:
         csvLines.append(line)
@@ -17,16 +17,16 @@ X_train = []
 Y_train = []
 
 for line in csvLines:
-    correctionFactor = 15*(np.pi/180)
+    correctionFactor = 0.2
     for i in range(3):
         imgPath = line[i]
         imgName = imgPath.split('/')[-1]
-        currPath = 'TrainingData3/IMG/' + imgName
+        currPath = 'TrainingData1/IMG/' + imgName
         trainingImgBGR = cv2.imread(currPath)
         trainingImgRGB = cv2.cvtColor(trainingImgBGR, cv2.COLOR_BGR2RGB)
-        #trainingFlippedImgRGB = cv2.flip(trainingImgRGB, 1)
+        trainingFlippedImgRGB = cv2.flip(trainingImgRGB, 1)
         X_train.append(trainingImgRGB)
-        #X_train.append(trainingFlippedImgRGB)
+        X_train.append(trainingFlippedImgRGB)
         if i == 0:
             trainingMeasurement = float(line[3])
         elif i == 1:
@@ -34,7 +34,7 @@ for line in csvLines:
         elif i == 2:
             trainingMeasurement = float(line[3]) - correctionFactor
         Y_train.append(trainingMeasurement)
-        #Y_train.append(-trainingMeasurement)
+        Y_train.append(-trainingMeasurement)
 
         
 X_train = np.array(X_train)
@@ -42,9 +42,7 @@ Y_train = np.array(Y_train)
 
 
 
-#%% USING MODEL OF PROJECT 3 (TRAFFIC SIGN CLASSIFIER)
-# As first model alternative for this task, the improved LeNet network used on the last project is used. Here it is programmed
-# again using Keras
+#%% DEFINITION OF THE MODEL
 
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
@@ -92,32 +90,9 @@ model.add(Dense(1))
 
 model.summary()
 
-#%% PREPARATION OF THE DATA
+#%% TRAINING AND SAVING THE MODEL
 
-from keras.preprocessing.image import ImageDataGenerator
-from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
-
-## Shuffles train data 
-X_train, Y_train = shuffle(X_train, Y_train)
-
-## Splits train data into train and validation
-X_train, X_valid, Y_train, Y_valid = train_test_split(X_train, Y_train, test_size = 0.15, random_state = 347534)
-
-### Generator of augmented data (It is very important that horizontal flip and vertical flip are false!)
-datagenTrain = ImageDataGenerator(
-    featurewise_center=False,
-    featurewise_std_normalization=False,
-    rotation_range=10,
-    width_shift_range=0.15,
-    height_shift_range=0.15,
-    horizontal_flip=False, 
-    vertical_flip=False)
-
-datagenValidation = ImageDataGenerator()
-
-#%% CALLBACKS FOR TRAINING  
-from keras.callbacks import Callback, ModelCheckpoint, EarlyStopping
+from keras.callbacks import Callback
 
 class LossHistory(Callback):
     def on_train_begin(self, logs={}):
@@ -125,26 +100,38 @@ class LossHistory(Callback):
 
     def on_batch_end(self, batch, logs={}):
         self.trainingLoss.append(logs.get('loss'))
-        
-## Callback to save the best model
-modelCheckpoint = ModelCheckpoint(filepath = 'modelBest.h5', monitor = 'val_loss', save_best_only = True)
-earlyStopper = EarlyStopping(monitor = 'val_loss', min_delta = 0.0003, patience = 5)
-
-#%% TRAINING OF THE MODEL
 
 model.compile(loss = 'mse', optimizer = 'adam')
 datalogBatches = LossHistory()
-datalogEpochs = model.fit_generator(datagenTrain.flow(X_train, Y_train, batch_size=32), steps_per_epoch=len(X_train)/32,
-                                    epochs = 30, verbose = 1, validation_data = datagenValidation.flow(X_valid, Y_valid, batch_size=32), 
-                                    validation_steps = len(X_valid)/32, callbacks = [datalogBatches, modelCheckpoint, earlyStopper])
-
-#datalogEpochs = model.fit(X_train, Y_train, validation_split=0.2, shuffle = True, epochs = 20, callbacks = [datalogBatches])
+datalogEpochs = model.fit(X_train, Y_train, validation_split=0.2, shuffle = True, epochs = 20, callbacks = [datalogBatches])
 model.save('model.h5')
 
-#%%
+#%% SAVES DATA TO BE ANALYSED AFTERWARDS
 
 import pickle
 with open('modelDatalog.p', 'wb') as pickleFile:
     pickle.dump(datalogBatches.trainingLoss, pickleFile)
     pickle.dump(datalogEpochs.history['loss'], pickleFile)
     pickle.dump(datalogEpochs.history['val_loss'], pickleFile)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
