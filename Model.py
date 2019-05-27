@@ -13,7 +13,7 @@ with open('TrainingData1/driving_log.csv') as csvFile:
     for line in reader:
         csvLines.append(line)
         
-X_train = []
+X_train = [] 
 Y_train = []
 
 for line in csvLines:
