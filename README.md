@@ -33,6 +33,7 @@ As a starting point, the model used for the [traffic sign classifier ](https://g
 - Fully connected layer with 43 outputs and Relu activation function.
 - Fully connected layer with 1 output and Relu activation function.
 
+
 A visualization of the model here:
 
 ![ Image1](./ImgsReport/07_ModelArchitecture.png  "TrainingData3Cameras")
@@ -91,6 +92,9 @@ Two things can still be improved. One is the model and the other one is the data
 Until now, we are training the model with only 11577 images, this is considered a little dataset. The next step in order to improve the performance of the model is to get more data. 
 
 Using the simulator, about 45 minutes of data were collected, this corresponds to 48651 images. This would still be considered a little dataset, but at least 4 times bigger than the original one. This dataset is also more diverse. It contains:
+
+Using the simulator, about 1,5 hours of data were collected, this corresponds to 48651 images. This would still be considered a little dataset, but at least 4 times bigger than the original one. This dataset is also more diverse. It contains:
+
 - Images of the training loop in clockwise direction.
 - Images of the training loop in counter clockwise direction.
 - Images of the training loop with the car reaching the border of the street and coming back.
@@ -115,6 +119,7 @@ It is important to mention that other more complex models were trained and teste
 
 ### Training for a new route
 
+
 The model is now able to drive a car in the route 1. Now it could be trained for a second route using the last trained model as a base. This new route looks more like a normal street and is way more difficult to drive than the first route since it has more curves and slopes.  
 
 In order to train the model to be able to drive this route, about 1.5 hours of driving data on this route were recorded, this is equivalent to 87897 images. 3 laps in clockwise direction and 3 laps in counterclockwise direction. The model was trained using the weights obtained on the last training.
@@ -137,7 +142,10 @@ A more traditional approach for this task would be [detecting the lane line and 
 
 As said before, in order to get a better performance from the model on the second track, it will need to learn also which speed is needed on every curve, because now the speed is inconsistent since it is a constant given by a PI controller. In order to do this, the file drive.py and the model will need to be modified and the model will need to be trained again from zero using the data of the second track.
 
- 
+The model is now able to drive a car in the route 1. Now it could be trained for a second route using the last trained model as a base. This new route looks more like a normal street and is way more difficult to drive than the first route since it has more curves and slopes. 
+
+
+
 
 
 

@@ -6,7 +6,10 @@ TrainingData2/
 TrainingData3/
 TrainingDataNew/
 TrainingDataProcessed/
+<<<<<<< HEAD
 TrainingDataNewTrack/
+=======
+>>>>>>> 7d444f17b672d17dc593b258198dfecda7c05458
 DataUdacity/
 
 # Ignore videos used on the report
@@ -19,10 +22,16 @@ ModelWorking/
 # Ignore compressed data
 OriginalData.tar.gz
 TrainingDataNew.tar.gz
+<<<<<<< HEAD
 TrainingDataNewTrack.tar.gz
+=======
+>>>>>>> 7d444f17b672d17dc593b258198dfecda7c05458
 
 # Ignore models
 model.h5
 modelPretrained.h5
+<<<<<<< HEAD
 model2TrackBest.h5
+=======
+>>>>>>> 7d444f17b672d17dc593b258198dfecda7c05458
 

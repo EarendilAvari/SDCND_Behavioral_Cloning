@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 
 csvLines = []
-with open('TrainingData1/driving_log.csv') as csvFile:
+with open('TrainingData3/driving_log.csv') as csvFile:
     reader = csv.reader(csvFile)
     for line in reader:
         csvLines.append(line)
@@ -21,7 +21,7 @@ for line in csvLines:
     for i in range(3):
         imgPath = line[i]
         imgName = imgPath.split('/')[-1]
-        currPath = 'TrainingData1/IMG/' + imgName
+        currPath = 'TrainingData3/IMG/' + imgName
         trainingImgBGR = cv2.imread(currPath)
         trainingImgRGB = cv2.cvtColor(trainingImgBGR, cv2.COLOR_BGR2RGB)
         #trainingFlippedImgRGB = cv2.flip(trainingImgRGB, 1)
